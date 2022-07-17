@@ -7,6 +7,8 @@ SawOsc saw;
 SoundFile[] file;
 
 int numsounds = 5;
+int state =0;
+String comPortChoice;
 static String val;
 int width=20;
 String portName;
@@ -29,21 +31,21 @@ void setup()
   // is Serial.list()[0].
   // On Windows machines, this generally opens COM1.
   // Open whatever port is the one you're using.
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<Serial.list().length; i++) {
     portName = Serial.list()[i];
-    println(portName);
-
-
-
-    //     String portName = Serial.list()[1]; //change the 0 to a 1 or 2 etc. to match your port
+    println(i+" --> "+portName);
   }
-  try {
-    myPort = new Serial(this, Serial.list()[3], 9600);
+  println("!!!!!!!!!!!!!!!!! ");
+  println("Wybierz COM port ");
+// while(!keyPressed){
+   try {
+    myPort = new Serial(this, Serial.list()[7], 9600);
   }
   catch (Exception x) {
     // Print command when exception encountered
     System.out.println("Exception" + x);
   }
+
   // Create an array of empty soundfiles
   file = new SoundFile[numsounds];
   // Load 5 soundfiles from a folder in a for loop. By naming the files 1., 2., 3., n.aif it is easy to iterate
@@ -92,51 +94,41 @@ void keyPressed() {
     String moja=str(key);
     mval=(moja+" pressed");
       String[] msplitval = mval.split("\\s+");
-      println(msplitval[0]);
-      println(msplitval[1]);
+     // println(msplitval[0]);
+     // println(msplitval[1]);
       if (msplitval[0]!="null") {
-     switch(msplitval[0]) {
-        case "1":
           playSmpl(int(msplitval[0]));
-          break;
-        case "2":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "3":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "4":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "5":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "6":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "7":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "8":
-          playSmpl(int(msplitval[0]));
-          break;
-        case "9":
-          playSmpl(int(msplitval[0]));
-          break;
-        default:
-        }
+          comPortChoice=msplitval[0];
       }
     }
 }
 void draw()
 {
+      if (state==0){
+        if(keyPressed){
+      comPortChoice=str(key);
+      println("Wybrano "+comPortChoice);
+//      break;
+//    }
+ }
+    if(comPortChoice!=null){
+        state=1;
+  //  break;
+    try {
+    myPort = new Serial(this, Serial.list()[int(comPortChoice)], 9600);
+  }
+  catch (Exception x) {
+    // Print command when exception encountered
+    System.out.println("Exception" + x);
+  }
+
+    }
+    else if (state==1){
   if (myPort!=null) {
     if ( myPort.available() > 0) 
     {  // If data is available,
       val = myPort.readStringUntil('\n');         // read it and store it in val
-      //println(val); //print it out in the console
       if (val!=null) {
-        // val=
         String[] splitval = val.split("\\s+");
         println(splitval[0]);
         println(splitval[1]);
@@ -148,4 +140,7 @@ void draw()
       }
     }
   }
+    }
+}
+  
 }
